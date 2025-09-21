@@ -81,7 +81,7 @@ const ShopContextProvider = (props) => {
         if(token) {
             try {
 
-                await axios.post(backendUrl + '/api/cart/add', {itemId, size, quantity}, { headers:{token} })
+                await axios.post(backendUrl + '/api/cart/update', {itemId, size, quantity}, { headers:{token} })
             
             } catch (error) {
                 console.log(error)
@@ -91,22 +91,21 @@ const ShopContextProvider = (props) => {
     }
 
 const getCartAmount = () => {
-    let totalAmout = 0;
-    for (const items in cartItems) {
+  let totalAmout = 0;
+
+  for (const items in cartItems) {
+    for (const item in cartItems[items]) {
+      if (cartItems[items][item] > 0) {
         let itemInfo = products.find((product) => product._id === items);
-        for (const item in cartItems[items]) {
-            try {
-                if (cartItems[items][item] > 0) {
-                    totalAmout += itemInfo.price * cartItems[items][item]
-                }
-            } catch (error) {
-                console.log(error)
-                toast.error(error.message)
-            }
-        }
+        if (!itemInfo) continue;  
+        totalAmout += itemInfo.price * cartItems[items][item];
+      }
     }
-    return totalAmout;  // Move this here
-}
+  }
+
+  return totalAmout;
+};
+
 
 
     const getProductsData = async () => {
